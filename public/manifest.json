@@ -3,6 +3,7 @@
   "short_name": "Grok Escape",
   "description": "Help Grok collect chips, dodge viruses, and defeat the boss in this fun platformer!",
   "start_url": "/",
+  "id": "/?source=pwa",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
