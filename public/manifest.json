@@ -1,37 +1,23 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
-}
-{
-  "short_name": "Grok Escape",
   "name": "Grok's Circuit Escape",
-  "icons": [
-    { "src": "favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
-  ],
-  "start_url": ".",
+  "short_name": "Grok Escape",
+  "description": "Help Grok collect chips, dodge viruses, and defeat the boss in this fun platformer!",
+  "start_url": "/",
   "display": "standalone",
+  "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "background_color": "#0f172a"
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "grok-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "grok-512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
 }
-
