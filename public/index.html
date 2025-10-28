@@ -3,64 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <meta name="theme-color" content="#0f172a" />
     <meta name="description" content="Grok's Circuit Escape - Help Grok collect chips and defeat viruses!" />
     <link rel="manifest" href="/manifest.json" />
     <title>Grok's Circuit Escape</title>
     <style>
       * { margin:0; padding:0; box-sizing:border-box; }
-      html, body { width:100%; height:100%; overflow:hidden; background:#0f172a; font-family:Arial; color:white; }
-      #root { width:100vw; height:100vh; }
-      
-      /* LANDING PAGE */
-      .landing {
-        position: fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #1a1a2e, #16213e); 
-        display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:1000;
-      }
-      .title { font-size:48px; font-weight:bold; margin-bottom:20px; text-shadow:0 0 10px #4f46e5; }
-      .btn { background:#4f46e5; color:white; border:none; padding:15px 30px; margin:10px; border-radius:50px; font-size:20px; cursor:pointer; box-shadow:0 5px 15px rgba(79,70,229,0.4); }
-      .btn:active { transform:scale(0.95); }
-
-      /* HOW TO PLAY */
-      .howto { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
-      .howto h2 { font-size:32px; margin-bottom:20px; }
-      .howto p { font-size:18px; margin:10px 0; text-align:center; max-width:80%; }
-      .close { background:#e74c3c; padding:10px 20px; border-radius:50px; margin-top:30px; }
-
-      /* MOBILE CONTROLS (LANDSCAPE) */
-      .controls { position:fixed; bottom:10px; left:10px; right:10px; display:flex; justify-content:space-between; z-index:100; }
-      .joy { width:70px; height:70px; background:rgba(255,255,255,0.3); border-radius:50%; }
-      .jump { width:65px; height:65px; background:#4f46e5; color:white; border-radius:50%; font-size:32px; display:flex; align-items:center; justify-content:center; }
-
-      /* ANIMATED GROK (LANDING) */
-      .grok-landing { width:120px; height:120px; background:url('grok-icon.png') center/contain no-repeat; animation:grokwalk 1s steps(4) infinite; margin-bottom:30px; }
-      @keyframes grokwalk { 0% { background-position:0 0; } 100% { background-position:-480px 0; } }
+      html, body, #root { width:100%; height:100%; overflow:hidden; }
+      .game-container { width:100vw; height:100vh; position:relative; }
+      canvas { width:100% !important; height:100% !important; }
+      .controls { position:fixed; bottom:20px; left:20px; right:20px; display:flex; justify-content:space-between; z-index:1000; }
+      .joy, .jump { width:70px; height:70px; background:rgba(255,255,255,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; color:white; }
     </style>
   </head>
   <body>
-    <noscript>You need JavaScript to play.</noscript>
     <div id="root"></div>
 
-    <!-- LANDING PAGE -->
-    <div class="landing" id="landing">
-      <div class="grok-landing"></div>
-      <div class="title">Grok's Circuit Escape</div>
-      <button class="btn" id="startBtn">Start Game</button>
-      <button class="btn" id="howtoBtn">How to Play</button>
-    </div>
-
-    <!-- HOW TO PLAY -->
-    <div class="howto" id="howto">
-      <h2>How to Play</h2>
-      <p>Swipe left/right to move Grok</p>
-      <p>Tap ↑ to jump</p>
-      <p>Collect chips, avoid viruses!</p>
-      <p>Reach the boss to win!</p>
-      <button class="close" id="closeHowto">Close</button>
-    </div>
-
-    <!-- MOBILE CONTROLS -->
+    <!-- Mobile Controls -->
     <div class="controls">
       <div class="joy" id="joystick"></div>
       <div class="jump" id="jumpBtn">↑</div>
@@ -68,14 +28,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
     <script>
-      // Show/Hide Landing & HowTo
-      const landing = document.getElementById('landing');
-      const howto = document.getElementById('howto');
-      document.getElementById('startBtn').onclick = () => landing.style.display = 'none';
-      document.getElementById('howtoBtn').onclick = () => howto.style.display = 'flex';
-      document.getElementById('closeHowto').onclick = () => howto.style.display = 'none';
+      // Force Landscape
+      if (screen.orientation) screen.orientation.lock('landscape').catch(() => {});
 
-      // Mobile Joystick
+      // Auto-start
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const btn = document.querySelector('button');
+          if (btn) btn.click();
+        }, 500);
+      });
+
+      // Joystick
       const manager = nipplejs.create({
         zone: document.getElementById('joystick'),
         mode: 'static',
@@ -85,34 +49,28 @@
 
       let left = false, right = false;
       manager.on('move', (evt, data) => {
-        if (data.direction) {
-          left = data.direction.x === 'left';
-          right = data.direction.x === 'right';
-        }
+        left = data.direction?.x === 'left';
+        right = data.direction?.x === 'right';
       });
       manager.on('end', () => { left = right = false; });
 
-      // Jump Button
-      const jumpBtn = document.getElementById('jumpBtn');
-      jumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keydown', {key: ' '})); });
-      jumpBtn.addEventListener('touchend', (e) => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent('keyup', {key: ' '})); });
+      // Jump
+      document.getElementById('jumpBtn').addEventListener('touchstart', e => {
+        e.preventDefault();
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: ' '}));
+      });
+      document.getElementById('jumpBtn').addEventListener('touchend', e => {
+        e.preventDefault();
+        window.dispatchEvent(new KeyboardEvent('keyup', {key: ' '}));
+      });
 
       // Simulate keys
       setInterval(() => {
-        ['ArrowLeft', 'ArrowRight'].forEach(key => {
-          const pressed = (key === 'ArrowLeft' && left) || (key === 'ArrowRight' && right);
-          if (pressed && !document.activeElement) {
-            window.dispatchEvent(new KeyboardEvent('keydown', {key}));
-          } else {
-            window.dispatchEvent(new KeyboardEvent('keyup', {key}));
-          }
+        ['ArrowLeft', 'ArrowRight'].forEach(k => {
+          const down = (k === 'ArrowLeft' && left) || (k === 'ArrowRight' && right);
+          window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', {key: k}));
         });
       }, 16);
-
-      // Force Landscape
-      if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(() => {});
-      }
     </script>
   </body>
 </html>
